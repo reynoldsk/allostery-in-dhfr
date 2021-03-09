@@ -1,0 +1,1 @@
+/path/SL4T0_merged.fastq	SLX	SL4T0

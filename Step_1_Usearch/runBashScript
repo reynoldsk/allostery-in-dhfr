@@ -1,0 +1,8 @@
+#!/bin/bash
+#SBATCH --job-name=ucombiner_T
+#SBATCH --partition=super
+#SBATCH --nodes=1
+#SBATCH --time=05-00:00:00
+#SBATCH --output=ucombiner_T.%j.out
+#SBATCH --error=ucombiner_T.%j.err
+bash UCOMBINER.bsh

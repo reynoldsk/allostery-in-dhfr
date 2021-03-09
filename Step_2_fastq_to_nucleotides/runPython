@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH --job-name=DL121
+#SBATCH --partition=super
+#SBATCH --nodes=1
+#SBATCH --time=05-00:00:00
+#SBATCH --output=DL121.%j.out
+#SBATCH --error=DL121.%j.err
+python DL121_fastq_analysis.py $1
+
+
+
+
+#in command line type: for x in *_input.txt; do echo "bash runPython $x" ;done

@@ -1,0 +1,1 @@
+/path/T2V5_merged.fastq	SLX	T2V5

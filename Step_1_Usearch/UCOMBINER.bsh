@@ -1,0 +1,62 @@
+#!/bin/bash
+#James McCormick 2019
+
+# Use example: bash UCOMBINER.bsh 
+
+
+USEARCH=/path/usearch11.0.667_i86linux32 #change to own absolute path
+
+#set up logging script
+touch Logfile_COMBINER.txt
+echo -e "Version of usearch used was $USEARCH \n usearch was run on $(date +%m-%d-%Y) by $(whoami)\n" >> Logfile_COMBINER.txt
+
+#mkdir combinedFiles #where all the joined files will end up.
+
+#Gets number of file pairs to join.
+#can use to count number of fastq files, and subsitute for j<=6 to j<=END below
+#END=$(expr "$(ls *fastq |wc -l)" / 2 + 2) # expr breaks on non intiger math. Please keep the .fastq count a whole number.
+
+#Loop through files, Note that it skips the S0 Undetermined.fastq.gz files
+for ((j=1;j<=6;j++)); do   #loops for iterations of the T1V1, T2V2 versions of the fastq files
+    for ((i=1;i<=6;i++)); do
+        name=$(ls T${j}V${i}_R1_001.fastq | grep -o -P '.{0,5}.V.{0,1}') #grab the begining (sample name) of the file
+        #name=$(ls SL1T0_R1_001.fastq | grep -o -P '.{0,5}.V.{0,1}') #grab the begining (sample name) of the file  
+        #mkdir ${name} #makes directory to store the output. Has the same name as the start of the file
+        echo -e --------------------  ${name}  ---------------------------\n >> Logfile_COMBINER.txt
+        split -l 40000000 T${j}V${i}_R1_001.fastq ${name}R1 #splits the files into chunks of 40M lines each labeled R1aa, R1ab, R1ac, R1ad...
+        split -l 40000000 T${j}V${i}_R2_001.fastq ${name}R2 #splits the files into chunks of 40M lines each labeled R2aa, R2ab, R2ac, R2ad...
+        rcount=$(expr "$(ls ${name}R1* |wc -l)" + "$(ls ${name}R2* |wc -l)" / 2)
+        if [ $rcount -gt 4 ]; then #repeats command for 5 split files
+            $USEARCH -fastq_mergepairs ${name}R1aa -reverse ${name}R2aa -fastqout ${name}Raa_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ab -reverse ${name}R2ab -fastqout ${name}Rab_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ac -reverse ${name}R2ac -fastqout ${name}Rac_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ad -reverse ${name}R2ad -fastqout ${name}Rad_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ae -reverse ${name}R2ae -fastqout ${name}Rae_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+        elif [ $rcount -gt 3 ]; then
+            $USEARCH -fastq_mergepairs ${name}R1aa -reverse ${name}R2aa -fastqout ${name}Raa_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ab -reverse ${name}R2ab -fastqout ${name}Rab_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ac -reverse ${name}R2ac -fastqout ${name}Rac_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ad -reverse ${name}R2ad -fastqout ${name}Rad_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            
+        elif [ $rcount -gt 2 ]; then
+            $USEARCH -fastq_mergepairs ${name}R1aa -reverse ${name}R2aa -fastqout ${name}Raa_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ab -reverse ${name}R2ab -fastqout ${name}Rab_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ac -reverse ${name}R2ac -fastqout ${name}Rac_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            
+        elif [ $rcount -gt 1 ]; then
+            $USEARCH -fastq_mergepairs ${name}R1aa -reverse ${name}R2aa -fastqout ${name}Raa_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            $USEARCH -fastq_mergepairs ${name}R1ab -reverse ${name}R2ab -fastqout ${name}Rab_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+            
+        elif [ $rcount -gt 0 ]; then
+            $USEARCH -fastq_mergepairs R1aa -reverse ${name}R2aa -fastqout ${name}Raa_out  -fastq_maxdiffs 30  -fastq_nostagger  -fastq_minmergelen 140 -fastq_maxmergelen 250 -report ${name}.txt >> Logfile_COMBINER.txt
+        else
+            echo "Something is wrong ${name}" #will come up if file is too large. 
+        fi
+        cat *_out >> ${name}_merged.fastq
+        mv ./${name}_merged.fastq ./combinedFiles/${name}_merged.fastq
+        rm ${name}R1*
+        rm ${name}R2*
+        rm *_out
+        echo -e --------------------  ${name}  ---------------------------\n >> Logfile_COMBINER.txt
+    done
+done
